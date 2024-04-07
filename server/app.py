@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from flask import Flask, make_response, jsonify
 from flask_migrate import Migrate
 
@@ -19,19 +21,33 @@ def index():
 @app.route('/bakeries')
 def bakeries():
     bakeries = [bakery.to_dict() for bakery in Bakery.query.all()]
-    return jsonify(bakeries)
+
+    response = make_response(
+        bakeries,
+        200
+    )
+
+    return response
 
 @app.route('/bakeries/<int:id>')
 def bakery_by_id(id):
-    bakery = Bakery.query.get(id)
-    return jsonify(bakery.to_dict())
+    bakery = Bakery.query.filter(Bakery.id == id).first()
+
+    bakery_dict = bakery.to_dict()
+
+    response = make_response(
+        bakery_dict,
+        200
+    )
+
+    return response
 
 @app.route('/baked_goods/by_price')
 def baked_goods_by_price():
     baked_goods = BakedGood.query.order_by(BakedGood.price.desc()).all()
     baked_goods_list = [baked_good.to_dict() for baked_good in baked_goods]
+    
     return jsonify(baked_goods_list)
-
 @app.route('/baked_goods/most_expensive')
 def most_expensive_baked_good():
     most_expensive_good = BakedGood.query.order_by(BakedGood.price.desc()).first()
